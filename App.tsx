@@ -348,18 +348,18 @@ const App: React.FC = () => {
           <button 
             type="button" 
             onClick={() => setShowHelp(true)} 
-            className="text-[10px] font-bold tracking-[0.2em] uppercase text-gray-400 hover:text-black transition-colors"
+            className="text-[10px] font-bold tracking-[0.1em] text-gray-400 hover:text-black transition-colors"
           >
-            How to Use
+            使い方
           </button>
           
-          <button type="button" onClick={handleReset} className="text-[10px] font-bold tracking-[0.2em] uppercase text-gray-400 hover:text-red-400 transition-colors">
-            Reset Session
+          <button type="button" onClick={handleReset} className="text-[10px] font-bold tracking-[0.1em] text-gray-400 hover:text-red-400 transition-colors">
+            リセット
           </button>
 
           <label className="flex items-center cursor-pointer space-x-3 group">
-            <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-gray-400 group-hover:text-black transition-colors">
-              Translation
+            <span className="text-[10px] font-bold tracking-[0.1em] text-gray-400 group-hover:text-black transition-colors">
+              翻訳を表示
             </span>
             <div className="relative">
               <input type="checkbox" className="sr-only" checked={showTranslation} onChange={() => setShowTranslation(!showTranslation)} />
@@ -371,8 +371,8 @@ const App: React.FC = () => {
 
         <div className="flex items-center space-x-6">
           <label className="flex items-center cursor-pointer space-x-3 group">
-            <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-gray-400 group-hover:text-black transition-colors">
-              Slow Audio
+            <span className="text-[10px] font-bold tracking-[0.1em] text-gray-400 group-hover:text-black transition-colors">
+              ゆっくり再生
             </span>
             <div className="relative">
               <input type="checkbox" className="sr-only" checked={isSlowAudio} onChange={() => setIsSlowAudio(!isSlowAudio)} />
@@ -382,8 +382,8 @@ const App: React.FC = () => {
           </label>
 
           <label className="flex items-center cursor-pointer space-x-3 group">
-            <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-gray-400 group-hover:text-black transition-colors">
-              Word Audio
+            <span className="text-[10px] font-bold tracking-[0.1em] text-gray-400 group-hover:text-black transition-colors">
+              単語音声
             </span>
             <div className="relative">
               <input type="checkbox" className="sr-only" checked={enableWordAudio} onChange={() => setEnableWordAudio(!enableWordAudio)} />
@@ -395,8 +395,8 @@ const App: React.FC = () => {
 
         <div className="flex items-center space-x-6">
           <label className="flex items-center cursor-pointer space-x-3 group">
-            <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-gray-400 group-hover:text-black transition-colors">
-              Word Katakana
+            <span className="text-[10px] font-bold tracking-[0.1em] text-gray-400 group-hover:text-black transition-colors">
+              カタカナを表示
             </span>
             <div className="relative">
               <input type="checkbox" className="sr-only" checked={showWordKatakana} onChange={() => setShowWordKatakana(!showWordKatakana)} />
