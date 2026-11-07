@@ -125,6 +125,9 @@ const App: React.FC = () => {
   const [isLevelComplete, setIsLevelComplete] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
 
+  // New state for detecting In-App Browsers (Messenger, LINE, etc.)
+  const [isInAppBrowser, setIsInAppBrowser] = useState(false);
+
   const audioContextRef = useRef<AudioContext | null>(null);
   const currentSentenceRef = useRef<string | undefined>(undefined);
 
@@ -132,6 +135,20 @@ const App: React.FC = () => {
   useEffect(() => {
     slowAudioRef.current = isSlowAudio;
   }, [isSlowAudio]);
+
+  // Detect if running inside an in-app browser
+  useEffect(() => {
+    const ua = navigator.userAgent || navigator.vendor || (window as any).opera;
+    if (
+      ua.indexOf("FBAN") > -1 || 
+      ua.indexOf("FBAV") > -1 || 
+      ua.indexOf("Messenger") > -1 ||
+      ua.indexOf("Line") > -1 || 
+      ua.indexOf("Instagram") > -1
+    ) {
+      setIsInAppBrowser(true);
+    }
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -318,6 +335,30 @@ const App: React.FC = () => {
   const isViewingHistory = historyIndex !== null;
   const canGoBack = history.length > 0 && (historyIndex === null || historyIndex > 0);
   const fadeUp = "animate-in fade-in slide-in-from-bottom-2 duration-500 fill-mode-forwards";
+
+  // If in an in-app browser, show the warning screen instead of the app
+  if (isInAppBrowser) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-8 bg-[#fdfdfd] text-[#2c2c2c] font-sans text-center space-y-8">
+        <div className="text-6xl">⚠️</div>
+        <h1 className="text-2xl font-bold tracking-wide">ブラウザで開いてください</h1>
+        <p className="text-gray-600 max-w-md leading-relaxed">
+          現在、アプリ内ブラウザ（MessengerやLINEなど）で開かれているため、オフライン機能や音声機能が正常に動作しません。
+        </p>
+        
+        <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 max-w-md text-left text-sm text-gray-700 space-y-3">
+          <p className="font-bold text-black border-b pb-2 mb-2">【解決方法】</p>
+          <p>
+            画面右上や右下にある <strong>「︙（メニュー）」</strong> または <strong>「共有ボタン」</strong> をタップし、<br/>
+            <strong className="text-black text-base">「他のブラウザで開く」</strong> または <strong>「Safariで開く」</strong> を選択してください。
+          </p>
+          <p className="text-xs text-gray-500 pt-2 border-t">
+            ※Messengerの場合：設定 ➔ 写真とメディア ➔ 「リンクを外部ブラウザで開く」をオンにすると次回からスムーズです。
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center p-8 bg-[#fdfdfd] text-[#2c2c2c] selection:bg-gray-100 font-sans transition-all duration-700">
