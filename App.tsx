@@ -440,6 +440,12 @@ const App: React.FC = () => {
                 <h3 className="font-bold mb-1">マスタリー（習得）システム</h3>
                 <p>一度も間違えずに（単語を戻さずに）正解した文章は「マスター」として保存され、二度と出題されません。間違えた場合は、後で復習として再登場します。</p>
               </div>
+
+              <div className="bg-gray-50 border border-gray-200 p-4 rounded-xl text-gray-700 mt-4">
+                <h3 className="font-bold mb-1">📱 スマホでアプリとして使うには</h3>
+                <p className="text-xs mb-2"><strong>iPhone (Safari):</strong> 画面下の共有ボタン（□に↑）をタップし、「ホーム画面に追加」を選択します。</p>
+                <p className="text-xs"><strong>Android (Chrome):</strong> 右上のメニュー（⋮）をタップし、「ホーム画面に追加」を選択します。</p>
+              </div>
             </div>
 
             <div className="pt-4 flex justify-center">
@@ -655,7 +661,6 @@ const App: React.FC = () => {
         )}
       </div>
 
-      {/* Fixed Footer changed to standard flow at the bottom */}
       <footer className="mt-auto pt-8 pb-4 text-[10px] text-gray-400 opacity-60 hover:opacity-100 transition-opacity duration-300 text-center px-4 w-full">
         Base code by{" "}
         <a href="https://github.com/chrisloveliverpool-debug/Zen-Listen" target="_blank" rel="noopener noreferrer" className="font-bold underline decoration-gray-300 hover:text-black transition-colors">chrisloveliverpool-debug</a>
