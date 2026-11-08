@@ -37,34 +37,61 @@ const KatakanaText = ({
           const after = baseText.split(word)[1] || "";
 
           if (before) {
-            parts.push(<span key={`pre-${match.index}`} className="text-black">{before}</span>);
+            parts.push(
+              <span key={`pre-${match.index}`} className="text-black">
+                {before}
+              </span>,
+            );
           }
 
           parts.push(
-            <ruby key={`ruby-${match.index}`} className="mx-0 text-black" style={{ rubyAlign: "start", rubyPosition: "over" }}>
+            <ruby
+              key={`ruby-${match.index}`}
+              className="mx-0 text-black"
+              style={{ rubyAlign: "start", rubyPosition: "over" }}
+            >
               {word}
-              <rt className={`text-[0.55em] font-bold text-red-600 transition-all duration-300 ${showReading ? "opacity-100" : "opacity-0 overflow-hidden"}`} style={{ lineHeight: "1.6", paddingBottom: "2px" }}>
+              <rt
+                className={`text-[0.55em] font-bold text-red-600 transition-all duration-300 ${showReading ? "opacity-100" : "opacity-0 overflow-hidden"}`}
+                style={{ lineHeight: "1.6", paddingBottom: "2px" }}
+              >
                 {reading}
               </rt>
             </ruby>,
           );
 
           if (after) {
-            parts.push(<span key={`post-${match.index}`} className="text-black">{after}</span>);
+            parts.push(
+              <span key={`post-${match.index}`} className="text-black">
+                {after}
+              </span>,
+            );
           }
         } else {
-          parts.push(<span key={`text-${match.index}`} className="text-black">{baseText}</span>);
+          parts.push(
+            <span key={`text-${match.index}`} className="text-black">
+              {baseText}
+            </span>,
+          );
         }
 
         lastIndex = regex.lastIndex;
       }
 
       if (lastIndex < str.length) {
-        parts.push(<span key="text-end" className="text-black">{str.slice(lastIndex)}</span>);
+        parts.push(
+          <span key="text-end" className="text-black">
+            {str.slice(lastIndex)}
+          </span>,
+        );
       }
       return parts.length > 0 ? parts : [str];
     }
-    return [<span key="raw" className="text-black">{str}</span>];
+    return [
+      <span key="raw" className="text-black">
+        {str}
+      </span>,
+    ];
   };
   return <>{parseReading(text)}</>;
 };
@@ -90,7 +117,9 @@ const WordBlock = ({
               <KatakanaText text={chunk.katakana} showReading={true} />
             </div>
           )}
-          <div className="text-xs text-gray-600 font-medium">{chunk.hintJa}</div>
+          <div className="text-xs text-gray-600 font-medium">
+            {chunk.hintJa}
+          </div>
           <div className="absolute top-full left-1/2 -translate-x-1/2 border-[6px] border-transparent border-t-white" />
         </div>
       )}
@@ -120,7 +149,7 @@ const App: React.FC = () => {
   const [isCorrect, setIsCorrect] = useState(false);
   const [history, setHistory] = useState<EnglishSentenceWithId[]>([]);
   const [historyIndex, setHistoryIndex] = useState<number | null>(null);
-  
+
   const [hasMadeMistake, setHasMadeMistake] = useState(false);
   const [isLevelComplete, setIsLevelComplete] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
@@ -140,10 +169,10 @@ const App: React.FC = () => {
   useEffect(() => {
     const ua = navigator.userAgent || navigator.vendor || (window as any).opera;
     if (
-      ua.indexOf("FBAN") > -1 || 
-      ua.indexOf("FBAV") > -1 || 
+      ua.indexOf("FBAN") > -1 ||
+      ua.indexOf("FBAV") > -1 ||
       ua.indexOf("Messenger") > -1 ||
-      ua.indexOf("Line") > -1 || 
+      ua.indexOf("Line") > -1 ||
       ua.indexOf("Instagram") > -1
     ) {
       setIsInAppBrowser(true);
@@ -154,7 +183,7 @@ const App: React.FC = () => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
       if (
-        (e.key === "Enter" || e.key === " ") && 
+        (e.key === "Enter" || e.key === " ") &&
         !["INPUT", "TEXTAREA"].includes(target.tagName)
       ) {
         e.preventDefault();
@@ -169,7 +198,9 @@ const App: React.FC = () => {
 
   const playSuccessSound = useCallback(() => {
     if (!audioContextRef.current)
-      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      audioContextRef.current = new (
+        window.AudioContext || (window as any).webkitAudioContext
+      )();
     const ctx = audioContextRef.current;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
@@ -207,11 +238,14 @@ const App: React.FC = () => {
       setAvailableWords([]);
       setIsCorrect(false);
       setHistoryIndex(null);
-      setHasMadeMistake(false); 
+      setHasMadeMistake(false);
 
       try {
-        const newSentence = await fetchRandomSentence(targetLevel, currentSentenceRef.current);
-        
+        const newSentence = await fetchRandomSentence(
+          targetLevel,
+          currentSentenceRef.current,
+        );
+
         if (newSentence === null) {
           setIsLevelComplete(true);
           setAppState(AppState.IDLE);
@@ -220,13 +254,13 @@ const App: React.FC = () => {
 
         currentSentenceRef.current = newSentence.english;
         setSentence(newSentence);
-        
+
         const allWords = [
           ...(newSentence.wordBank || []),
-          ...(newSentence.distractors || [])
+          ...(newSentence.distractors || []),
         ];
         setAvailableWords(shuffleWordBank(allWords));
-        
+
         setAppState(AppState.LISTENING);
       } catch (error) {
         console.error("Initialization error", error);
@@ -264,7 +298,8 @@ const App: React.FC = () => {
   };
 
   const playAudio = useCallback(async () => {
-    const activeSentence = historyIndex !== null ? history[historyIndex].english : sentence?.english;
+    const activeSentence =
+      historyIndex !== null ? history[historyIndex].english : sentence?.english;
     if (activeSentence) {
       speak(activeSentence, isSlowAudio ? 0.75 : 1.0);
     }
@@ -285,7 +320,7 @@ const App: React.FC = () => {
       setAppState(AppState.FINISHED);
       playSuccessSound();
       setHistory((prev) => [...prev, sentence]);
-      
+
       if (!hasMadeMistake) {
         markAsMastered(sentence.id);
       }
@@ -320,7 +355,8 @@ const App: React.FC = () => {
       } else if (historyIndex > 0) setHistoryIndex(historyIndex - 1);
     } else {
       if (historyIndex !== null) {
-        if (historyIndex < history.length - 1) setHistoryIndex(historyIndex + 1);
+        if (historyIndex < history.length - 1)
+          setHistoryIndex(historyIndex + 1);
         else setHistoryIndex(null);
       }
     }
@@ -331,29 +367,42 @@ const App: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const displayedSentence = historyIndex !== null ? history[historyIndex] : sentence;
+  const displayedSentence =
+    historyIndex !== null ? history[historyIndex] : sentence;
   const isViewingHistory = historyIndex !== null;
-  const canGoBack = history.length > 0 && (historyIndex === null || historyIndex > 0);
-  const fadeUp = "animate-in fade-in slide-in-from-bottom-2 duration-500 fill-mode-forwards";
+  const canGoBack =
+    history.length > 0 && (historyIndex === null || historyIndex > 0);
+  const fadeUp =
+    "animate-in fade-in slide-in-from-bottom-2 duration-500 fill-mode-forwards";
 
   // If in an in-app browser, show the warning screen instead of the app
   if (isInAppBrowser) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-8 bg-[#fdfdfd] text-[#2c2c2c] font-sans text-center space-y-8">
         <div className="text-6xl">⚠️</div>
-        <h1 className="text-2xl font-bold tracking-wide">ブラウザで開いてください</h1>
+        <h1 className="text-2xl font-bold tracking-wide">
+          ブラウザで開いてください
+        </h1>
         <p className="text-gray-600 max-w-md leading-relaxed">
           現在、アプリ内ブラウザ（MessengerやLINEなど）で開かれているため、オフライン機能や音声機能が正常に動作しません。
         </p>
-        
+
         <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 max-w-md text-left text-sm text-gray-700 space-y-3">
-          <p className="font-bold text-black border-b pb-2 mb-2">【解決方法】</p>
+          <p className="font-bold text-black border-b pb-2 mb-2">
+            【解決方法】
+          </p>
           <p>
-            画面右上や右下にある <strong>「︙（メニュー）」</strong> または <strong>「共有ボタン」</strong> をタップし、<br/>
-            <strong className="text-black text-base">「他のブラウザで開く」</strong> または <strong>「Safariで開く」</strong> を選択してください。
+            画面右上や右下にある <strong>「︙（メニュー）」</strong> または{" "}
+            <strong>「共有ボタン」</strong> をタップし、
+            <br />
+            <strong className="text-black text-base">
+              「他のブラウザで開く」
+            </strong>{" "}
+            または <strong>「Safariで開く」</strong> を選択してください。
           </p>
           <p className="text-xs text-gray-500 pt-2 border-t">
-            ※Messengerの場合：設定 ➔ 写真とメディア ➔ 「リンクを外部ブラウザで開く」をオンにすると次回からスムーズです。
+            ※Messengerの場合：設定 ➔ 写真とメディア ➔
+            「リンクを外部ブラウザで開く」をオンにすると次回からスムーズです。
           </p>
         </div>
       </div>
@@ -362,10 +411,11 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center p-8 bg-[#fdfdfd] text-[#2c2c2c] selection:bg-gray-100 font-sans transition-all duration-700">
-      
       <div className="fixed top-12 left-12 z-30">
         <p className="text-[10px] text-gray-400 font-medium max-w-[200px] leading-tight">
-          進捗はこのブラウザにのみ保存されます。<br/>別の端末では最初からになります。
+          進捗はこのブラウザにのみ保存されます。
+          <br />
+          別の端末では最初からになります。
         </p>
       </div>
 
@@ -377,7 +427,9 @@ const App: React.FC = () => {
               type="button"
               onClick={() => handleLevelChange(lvl)}
               className={`text-xs font-semibold tracking-[0.4em] transition-all duration-300 ${
-                level === lvl ? "text-black scale-125" : "text-gray-200 hover:text-gray-400"
+                level === lvl
+                  ? "text-black scale-125"
+                  : "text-gray-200 hover:text-gray-400"
               }`}
             >
               {lvl}
@@ -386,15 +438,19 @@ const App: React.FC = () => {
         </nav>
 
         <div className="flex items-center space-x-6">
-          <button 
-            type="button" 
-            onClick={() => setShowHelp(true)} 
+          <button
+            type="button"
+            onClick={() => setShowHelp(true)}
             className="text-[10px] font-bold tracking-[0.1em] text-gray-400 hover:text-black transition-colors"
           >
             使い方
           </button>
-          
-          <button type="button" onClick={handleReset} className="text-[10px] font-bold tracking-[0.1em] text-gray-400 hover:text-red-400 transition-colors">
+
+          <button
+            type="button"
+            onClick={handleReset}
+            className="text-[10px] font-bold tracking-[0.1em] text-gray-400 hover:text-red-400 transition-colors"
+          >
             リセット
           </button>
 
@@ -403,9 +459,18 @@ const App: React.FC = () => {
               翻訳を表示
             </span>
             <div className="relative">
-              <input type="checkbox" className="sr-only" checked={showTranslation} onChange={() => setShowTranslation(!showTranslation)} />
-              <div className={`block w-10 h-6 rounded-full transition-colors ${showTranslation ? "bg-black" : "bg-gray-200"}`}></div>
-              <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${showTranslation ? "translate-x-4" : ""}`}></div>
+              <input
+                type="checkbox"
+                className="sr-only"
+                checked={showTranslation}
+                onChange={() => setShowTranslation(!showTranslation)}
+              />
+              <div
+                className={`block w-10 h-6 rounded-full transition-colors ${showTranslation ? "bg-black" : "bg-gray-200"}`}
+              ></div>
+              <div
+                className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${showTranslation ? "translate-x-4" : ""}`}
+              ></div>
             </div>
           </label>
         </div>
@@ -416,9 +481,18 @@ const App: React.FC = () => {
               ゆっくり再生
             </span>
             <div className="relative">
-              <input type="checkbox" className="sr-only" checked={isSlowAudio} onChange={() => setIsSlowAudio(!isSlowAudio)} />
-              <div className={`block w-10 h-6 rounded-full transition-colors ${isSlowAudio ? "bg-black" : "bg-gray-200"}`}></div>
-              <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${isSlowAudio ? "translate-x-4" : ""}`}></div>
+              <input
+                type="checkbox"
+                className="sr-only"
+                checked={isSlowAudio}
+                onChange={() => setIsSlowAudio(!isSlowAudio)}
+              />
+              <div
+                className={`block w-10 h-6 rounded-full transition-colors ${isSlowAudio ? "bg-black" : "bg-gray-200"}`}
+              ></div>
+              <div
+                className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${isSlowAudio ? "translate-x-4" : ""}`}
+              ></div>
             </div>
           </label>
 
@@ -427,9 +501,18 @@ const App: React.FC = () => {
               単語音声
             </span>
             <div className="relative">
-              <input type="checkbox" className="sr-only" checked={enableWordAudio} onChange={() => setEnableWordAudio(!enableWordAudio)} />
-              <div className={`block w-10 h-6 rounded-full transition-colors ${enableWordAudio ? "bg-black" : "bg-gray-200"}`}></div>
-              <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${enableWordAudio ? "translate-x-4" : ""}`}></div>
+              <input
+                type="checkbox"
+                className="sr-only"
+                checked={enableWordAudio}
+                onChange={() => setEnableWordAudio(!enableWordAudio)}
+              />
+              <div
+                className={`block w-10 h-6 rounded-full transition-colors ${enableWordAudio ? "bg-black" : "bg-gray-200"}`}
+              ></div>
+              <div
+                className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${enableWordAudio ? "translate-x-4" : ""}`}
+              ></div>
             </div>
           </label>
         </div>
@@ -440,14 +523,31 @@ const App: React.FC = () => {
               カタカナを表示
             </span>
             <div className="relative">
-              <input type="checkbox" className="sr-only" checked={showWordKatakana} onChange={() => setShowWordKatakana(!showWordKatakana)} />
-              <div className={`block w-10 h-6 rounded-full transition-colors ${showWordKatakana ? "bg-black" : "bg-gray-200"}`}></div>
-              <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${showWordKatakana ? "translate-x-4" : ""}`}></div>
+              <input
+                type="checkbox"
+                className="sr-only"
+                checked={showWordKatakana}
+                onChange={() => setShowWordKatakana(!showWordKatakana)}
+              />
+              <div
+                className={`block w-10 h-6 rounded-full transition-colors ${showWordKatakana ? "bg-black" : "bg-gray-200"}`}
+              ></div>
+              <div
+                className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${showWordKatakana ? "translate-x-4" : ""}`}
+              ></div>
             </div>
           </label>
         </div>
       </div>
-
+      {/* --- Antonio (Top Left) --- */}
+      <div className="fixed top-8 left-8 z-20 pointer-events-none opacity-40">
+        <img
+          src={`${import.meta.env.BASE_URL}Antonio.png`}
+          alt="Antonio"
+          className="w-20 h-20 md:w-24 md:h-24 object-contain mix-blend-multiply"
+        />
+      </div>
+      {/* --------------------------- */}
       {/* How to Use Modal */}
       {showHelp && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80 backdrop-blur-sm animate-in fade-in duration-300 p-4">
@@ -455,37 +555,53 @@ const App: React.FC = () => {
             <h2 className="text-2xl font-bold text-black tracking-wide text-center">
               アプリの使い方
             </h2>
-            
+
             <div className="space-y-4 text-sm text-gray-600 leading-relaxed">
               <div>
                 <h3 className="font-bold text-black mb-1">1. レベルを選択</h3>
                 <p>右上の A1 〜 C1 から、自分のレベルを選びます。</p>
               </div>
-              
+
               <div>
                 <h3 className="font-bold text-black mb-1">2. 音声を聴く</h3>
-                <p>中央の青いスピーカーアイコンをタップすると、英文が再生されます。何度でも聴けます。</p>
+                <p>
+                  中央の青いスピーカーアイコンをタップすると、英文が再生されます。何度でも聴けます。
+                </p>
               </div>
-              
+
               <div>
                 <h3 className="font-bold text-black mb-1">3. 単語を並べる</h3>
-                <p>画面下の単語チップをタップして、聴こえた英文を組み立てます。間違えた単語はタップして戻せます。</p>
+                <p>
+                  画面下の単語チップをタップして、聴こえた英文を組み立てます。間違えた単語はタップして戻せます。
+                </p>
               </div>
-              
+
               <div>
                 <h3 className="font-bold text-black mb-1">4. 答え合わせ</h3>
-                <p>正しく並べられると、緑色のチェックマークが表示されます。ヒントや文法の解説も確認できます。</p>
+                <p>
+                  正しく並べられると、緑色のチェックマークが表示されます。ヒントや文法の解説も確認できます。
+                </p>
               </div>
 
               <div className="bg-blue-50 border border-blue-100 p-4 rounded-xl text-blue-900 mt-4">
                 <h3 className="font-bold mb-1">マスタリー（習得）システム</h3>
-                <p>一度も間違えずに（単語を戻さずに）正解した文章は「マスター」として保存され、二度と出題されません。間違えた場合は、後で復習として再登場します。</p>
+                <p>
+                  一度も間違えずに（単語を戻さずに）正解した文章は「マスター」として保存され、二度と出題されません。間違えた場合は、後で復習として再登場します。
+                </p>
               </div>
 
               <div className="bg-gray-50 border border-gray-200 p-4 rounded-xl text-gray-700 mt-4">
-                <h3 className="font-bold mb-1">📱 スマホでアプリとして使うには</h3>
-                <p className="text-xs mb-2"><strong>iPhone (Safari):</strong> 画面下の共有ボタン（□に↑）をタップし、「ホーム画面に追加」を選択します。</p>
-                <p className="text-xs"><strong>Android (Chrome):</strong> 右上のメニュー（⋮）をタップし、「ホーム画面に追加」を選択します。</p>
+                <h3 className="font-bold mb-1">
+                  📱 スマホでアプリとして使うには
+                </h3>
+                <p className="text-xs mb-2">
+                  <strong>iPhone (Safari):</strong>{" "}
+                  画面下の共有ボタン（□に↑）をタップし、「ホーム画面に追加」を選択します。
+                </p>
+                <p className="text-xs">
+                  <strong>Android (Chrome):</strong>{" "}
+                  右上のメニュー（⋮）をタップし、「ホーム画面に追加」を選択します。
+                </p>
               </div>
             </div>
 
@@ -544,10 +660,23 @@ const App: React.FC = () => {
             disabled={!canGoBack}
             className={`px-5 py-3 rounded-full border border-gray-100 bg-white shadow-sm transition-all duration-300 active:scale-90 disabled:opacity-0 flex items-center space-x-2 ${canGoBack ? "hover:shadow-md hover:border-gray-200 text-gray-400 hover:text-black" : "pointer-events-none"}`}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19l-7-7 7-7" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
-            <span className="text-[10px] font-bold tracking-[0.2em] uppercase">Review</span>
+            <span className="text-[10px] font-bold tracking-[0.2em] uppercase">
+              Review
+            </span>
           </button>
 
           {isViewingHistory && (
@@ -556,9 +685,22 @@ const App: React.FC = () => {
               onClick={() => navigateHistory("next")}
               className="px-5 py-3 rounded-full border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:shadow-md hover:border-gray-200 text-gray-400 hover:text-black active:scale-90 flex items-center space-x-2"
             >
-              <span className="text-[10px] font-bold tracking-[0.2em] uppercase">Next</span>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
+              <span className="text-[10px] font-bold tracking-[0.2em] uppercase">
+                Next
+              </span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M9 5l7 7-7 7"
+                />
               </svg>
             </button>
           )}
@@ -576,11 +718,26 @@ const App: React.FC = () => {
           <button
             type="button"
             onClick={playAudio}
-            disabled={(!isViewingHistory && (appState === AppState.LOADING || !sentence)) || (isViewingHistory && !history[historyIndex])}
+            disabled={
+              (!isViewingHistory &&
+                (appState === AppState.LOADING || !sentence)) ||
+              (isViewingHistory && !history[historyIndex])
+            }
             className={`group relative w-20 h-20 rounded-full flex items-center justify-center transition-all duration-500 bg-blue-50 border border-blue-100 shadow-sm hover:shadow-lg hover:bg-blue-100 hover:border-blue-200 active:scale-95 disabled:opacity-30 ${appState === AppState.LOADING ? "animate-pulse" : ""}`}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className={`w-8 h-8 transition-colors ${!isViewingHistory && !sentence ? "text-blue-200" : "text-blue-500 group-hover:text-blue-700"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className={`w-8 h-8 transition-colors ${!isViewingHistory && !sentence ? "text-blue-200" : "text-blue-500 group-hover:text-blue-700"}`}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1}
+                d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
+              />
             </svg>
             {appState === AppState.LOADING && (
               <div className="absolute inset-0 rounded-full border-2 border-blue-500 border-t-transparent animate-spin opacity-10" />
@@ -612,8 +769,17 @@ const App: React.FC = () => {
 
                 {isCorrect && (
                   <div className="ml-2 animate-in zoom-in fade-in duration-500 fill-mode-forwards flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-500" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-8 w-8 text-green-500"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   </div>
                 )}
@@ -628,9 +794,25 @@ const App: React.FC = () => {
                     onClick={playMySentence}
                     className="flex items-center space-x-2 text-xs font-semibold tracking-[0.2em] uppercase text-gray-400 hover:text-black transition-colors"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
                     </svg>
                     <span>Play My Sentence</span>
                   </button>
@@ -651,64 +833,93 @@ const App: React.FC = () => {
           </div>
         )}
 
-        {(isCorrect || isViewingHistory) && displayedSentence && !isLevelComplete && (
-          <div className={`flex flex-col items-center space-y-8 w-full ${fadeUp}`}>
-            <div className="text-center space-y-4">
-              <div className="space-y-2">
-                <p className="text-4xl font-normal text-black flex justify-center flex-wrap gap-x-1 leading-[2] items-baseline">
-                  {displayedSentence.english}
-                </p>
-              </div>
-              
-              {showTranslation && (
-                <div className="pt-2 max-w-lg mx-auto animate-in fade-in duration-300">
-                  <p className="text-xl text-gray-600 font-light tracking-wide">
-                    {displayedSentence.translationJa}
+        {(isCorrect || isViewingHistory) &&
+          displayedSentence &&
+          !isLevelComplete && (
+            <div
+              className={`flex flex-col items-center space-y-8 w-full ${fadeUp}`}
+            >
+              <div className="text-center space-y-4">
+                <div className="space-y-2">
+                  <p className="text-4xl font-normal text-black flex justify-center flex-wrap gap-x-1 leading-[2] items-baseline">
+                    {displayedSentence.english}
                   </p>
                 </div>
-              )}
 
-              {displayedSentence.grammarNoteJa && (
-                <div className="pt-2 max-w-lg mx-auto animate-in fade-in duration-500">
-                  <div className="bg-blue-50/60 border border-blue-100 rounded-xl px-5 py-3 shadow-sm">
-                    <p className="text-sm font-medium text-blue-900 leading-relaxed text-center">
-                      {displayedSentence.grammarNoteJa}
+                {showTranslation && (
+                  <div className="pt-2 max-w-lg mx-auto animate-in fade-in duration-300">
+                    <p className="text-xl text-gray-600 font-light tracking-wide">
+                      {displayedSentence.translationJa}
                     </p>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
 
-            {!isViewingHistory && (
-              <div className="text-center pb-2 animate-in fade-in duration-500">
-                {hasMadeMistake ? (
-                  <p className="text-xs text-gray-400 font-medium">Passed (Needs review later)</p>
-                ) : (
-                  <p className="text-xs text-green-600 font-medium">✨ Perfect! Sentence Mastered.</p>
+                {displayedSentence.grammarNoteJa && (
+                  <div className="pt-2 max-w-lg mx-auto animate-in fade-in duration-500">
+                    <div className="bg-blue-50/60 border border-blue-100 rounded-xl px-5 py-3 shadow-sm">
+                      <p className="text-sm font-medium text-blue-900 leading-relaxed text-center">
+                        {displayedSentence.grammarNoteJa}
+                      </p>
+                    </div>
+                  </div>
                 )}
               </div>
-            )}
-            
-            <button
-              type="button"
-              onClick={() =>
-                isViewingHistory ? setHistoryIndex(null) : initSession()
-              }
-              className="px-10 py-4 bg-black text-white rounded-full text-xs font-semibold hover:bg-gray-800 transition-all hover:px-12 active:scale-95 tracking-[0.4em] uppercase shadow-lg shadow-black/5"
-            >
-              {isViewingHistory ? "Back to Current" : "Next Sentence"}
-            </button>
-          </div>
-        )}
+
+              {!isViewingHistory && (
+                <div className="text-center pb-2 animate-in fade-in duration-500">
+                  {hasMadeMistake ? (
+                    <p className="text-xs text-gray-400 font-medium">
+                      Passed (Needs review later)
+                    </p>
+                  ) : (
+                    <p className="text-xs text-green-600 font-medium">
+                      ✨ Perfect! Sentence Mastered.
+                    </p>
+                  )}
+                </div>
+              )}
+
+              <button
+                type="button"
+                onClick={() =>
+                  isViewingHistory ? setHistoryIndex(null) : initSession()
+                }
+                className="px-10 py-4 bg-black text-white rounded-full text-xs font-semibold hover:bg-gray-800 transition-all hover:px-12 active:scale-95 tracking-[0.4em] uppercase shadow-lg shadow-black/5"
+              >
+                {isViewingHistory ? "Back to Current" : "Next Sentence"}
+              </button>
+            </div>
+          )}
       </div>
 
       <footer className="mt-auto pt-8 pb-4 text-[10px] text-gray-400 opacity-60 hover:opacity-100 transition-opacity duration-300 text-center px-4 w-full">
         Base code by{" "}
-        <a href="https://github.com/chrisloveliverpool-debug/Zen-Listen" target="_blank" rel="noopener noreferrer" className="font-bold underline decoration-gray-300 hover:text-black transition-colors">chrisloveliverpool-debug</a>
-        {" "}• Perfected with the help of{" "}
-        <a href="https://github.com/ACG-Applications" target="_blank" rel="noopener noreferrer" className="font-bold underline decoration-gray-300 hover:text-black transition-colors">ACG-Applications</a>
-        {" "}and{" "}
-        <a href="https://github.com/deepseek-ai" target="_blank" rel="noopener noreferrer" className="font-bold underline decoration-gray-300 hover:text-black transition-colors">DeepSeek</a>
+        <a
+          href="https://github.com/chrisloveliverpool-debug/Zen-Listen"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-bold underline decoration-gray-300 hover:text-black transition-colors"
+        >
+          chrisloveliverpool-debug
+        </a>{" "}
+        • Perfected with the help of{" "}
+        <a
+          href="https://github.com/ACG-Applications"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-bold underline decoration-gray-300 hover:text-black transition-colors"
+        >
+          ACG-Applications
+        </a>{" "}
+        and{" "}
+        <a
+          href="https://github.com/deepseek-ai"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-bold underline decoration-gray-300 hover:text-black transition-colors"
+        >
+          DeepSeek
+        </a>
       </footer>
     </div>
   );
