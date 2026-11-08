@@ -411,7 +411,7 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center p-8 bg-[#fdfdfd] text-[#2c2c2c] selection:bg-gray-100 font-sans transition-all duration-700">
-      <div className="fixed top-12 left-12 z-30">
+      <div className="fixed top-32 left-8 z-30">
         <p className="text-[10px] text-gray-400 font-medium max-w-[200px] leading-tight">
           進捗はこのブラウザにのみ保存されます。
           <br />
