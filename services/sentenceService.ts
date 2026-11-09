@@ -43,38 +43,20 @@ export function resetLevelProgress(level: CEFRLevel) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(mastered));
 }
 
-const cleanString = (str: string) =>
-  str.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()！？。、（）\s]/g, "").toLowerCase();
-
-export async function fetchRandomSentence(
-  level: CEFRLevel,
-  currentEnglish?: string,
-): Promise<EnglishSentenceWithId | null> {
+// --- NEW DECK FUNCTION ---
+// Returns a shuffled array of sentences that have NOT been mastered yet.
+export function getUnseenDeck(level: CEFRLevel): EnglishSentenceWithId[] {
   const bank = BANKS[level];
   const masteredIds = getMasteredIds();
+
+  // Filter out sentences already marked as mastered
+  const unseen = bank.filter((s) => !masteredIds.includes(s.id));
   
-  // Filter out mastered sentences and the current sentence
-  const targetEnglish = currentEnglish ? cleanString(currentEnglish) : undefined;
-  
-  let availableChoices = bank.filter(
-    (s) => !masteredIds.includes(s.id) && cleanString(s.english) !== targetEnglish
-  );
-
-  // If all sentences are mastered, return null to trigger the modal
-  if (availableChoices.length === 0) {
-    return null; 
-  }
-
-  // If we filtered out the current sentence but others exist, reset the filter
-  if (availableChoices.length === 0) {
-    availableChoices = bank.filter((s) => !masteredIds.includes(s.id));
-  }
-
-  const randomIndex = Math.floor(Math.random() * availableChoices.length);
-  return availableChoices[randomIndex];
+  // Shuffle the unseen sentences
+  return shuffleWordBank(unseen);
 }
+// -------------------------
 
-// ... (Keep shuffleWordBank, normalizeForCompare, checkAnswer, validateSentence exactly as they are)
 export function shuffleWordBank<T>(items: readonly T[]): T[] {
   const arr = [...items];
   for (let i = arr.length - 1; i > 0; i--) {

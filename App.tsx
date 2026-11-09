@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
-  fetchRandomSentence,
+  getUnseenDeck,
   shuffleWordBank,
   checkAnswer as serviceCheckAnswer,
   markAsMastered,
@@ -154,11 +154,13 @@ const App: React.FC = () => {
   const [isLevelComplete, setIsLevelComplete] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
 
+  // DECK STATE
+  const [remainingSentences, setRemainingSentences] = useState<EnglishSentenceWithId[]>([]);
+
   // New state for detecting In-App Browsers (Messenger, LINE, etc.)
   const [isInAppBrowser, setIsInAppBrowser] = useState(false);
 
   const audioContextRef = useRef<AudioContext | null>(null);
-  const currentSentenceRef = useRef<string | undefined>(undefined);
 
   const slowAudioRef = useRef(isSlowAudio);
   useEffect(() => {
@@ -241,18 +243,25 @@ const App: React.FC = () => {
       setHasMadeMistake(false);
 
       try {
-        const newSentence = await fetchRandomSentence(
-          targetLevel,
-          currentSentenceRef.current,
-        );
+        let deck = remainingSentences;
 
-        if (newSentence === null) {
+        // If the deck is empty, fetch a fresh shuffled bank of unseen sentences
+        if (deck.length === 0) {
+          deck = getUnseenDeck(targetLevel);
+        }
+
+        // If there are still no sentences, the level is complete
+        if (deck.length === 0) {
           setIsLevelComplete(true);
           setAppState(AppState.IDLE);
           return;
         }
 
-        currentSentenceRef.current = newSentence.english;
+        // Pop the first sentence off the deck
+        const newSentence = deck[0];
+        const newDeck = deck.slice(1);
+        
+        setRemainingSentences(newDeck);
         setSentence(newSentence);
 
         const allWords = [
@@ -267,23 +276,25 @@ const App: React.FC = () => {
         setAppState(AppState.IDLE);
       }
     },
-    [level],
+    [level, remainingSentences],
   );
 
   const handleReset = () => {
-    currentSentenceRef.current = undefined;
+    setRemainingSentences([]);
     initSession();
   };
 
   const handleLevelChange = (newLevel: CEFRLevel) => {
     if (newLevel === level) return;
     setLevel(newLevel);
+    setRemainingSentences([]); // Clear deck when switching levels
     initSession(newLevel);
   };
 
   const handleResetLevel = () => {
     resetLevelProgress(level);
     setIsLevelComplete(false);
+    setRemainingSentences([]);
     handleReset();
   };
 
@@ -293,6 +304,7 @@ const App: React.FC = () => {
       const nextLevel = CEFR_LEVELS[currentIndex + 1];
       setLevel(nextLevel);
       setIsLevelComplete(false);
+      setRemainingSentences([]);
       initSession(nextLevel);
     }
   };
